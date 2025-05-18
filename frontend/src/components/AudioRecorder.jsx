@@ -6,6 +6,7 @@ function AudioRecorder() {
   const mediaRecorderRef = useRef(null);
   const [audioBlob, setAudioBlob] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [transcript, setTranscript] = useState(""); // ✅ transcript state
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -13,9 +14,7 @@ function AudioRecorder() {
     const chunks = [];
 
     mediaRecorderRef.current.ondataavailable = (e) => {
-      if (e.data.size > 0) {
-        chunks.push(e.data);
-      }
+      if (e.data.size > 0) chunks.push(e.data);
     };
 
     mediaRecorderRef.current.onstop = () => {
@@ -25,6 +24,7 @@ function AudioRecorder() {
 
     mediaRecorderRef.current.start();
     setRecording(true);
+    setTranscript(""); // yeni kayıt öncesi transcript sıfırlansın
   };
 
   const stopRecording = () => {
@@ -44,9 +44,9 @@ function AudioRecorder() {
         method: "POST",
         body: formData,
       });
-
       const data = await response.json();
       console.log("Transcription result:", data);
+      setTranscript(data.transcript); // ✅ state'e yaz
     } catch (err) {
       console.error("Upload error:", err);
     } finally {
@@ -72,14 +72,16 @@ function AudioRecorder() {
         <div className="text-center">
           <p className="mb-2 fw-semibold">🎧 Playback</p>
           <audio controls className="mb-3 w-100" src={URL.createObjectURL(audioBlob)} />
-
-          <button
-            className="btn btn-primary"
-            onClick={uploadAudio}
-            disabled={uploading}
-          >
+          <button className="btn btn-primary" onClick={uploadAudio} disabled={uploading}>
             {uploading ? "Uploading..." : "⬆ Upload"}
           </button>
+        </div>
+      )}
+
+      {transcript && (
+        <div className="mt-4 transcript-box p-3 rounded bg-light border">
+          <h5 className="fw-semibold">📝 Transcript:</h5>
+          <p className="text-muted">{transcript}</p>
         </div>
       )}
     </div>

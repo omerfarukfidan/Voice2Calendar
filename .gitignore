@@ -1,12 +1,28 @@
 # Python
-venv/
 __pycache__/
 *.pyc
 
-# Node
+# Virtualenv
+venv/
+
+# Node.js
 node_modules/
 build/
+
+# Environment
 .env
 
 # VSCode
 .vscode/
+
+# Vosk Speech Model – large files, don't commit
+backend/model/vosk-model-small-en-us-0.15/
+
+# Temporary uploaded/converted audio files
+backend/temp/
+
+# Audio/WebM garbage if left behind
+*.webm
+
+# Zip models or archives if ever downloaded
+*.zip
