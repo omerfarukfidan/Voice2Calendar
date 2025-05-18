@@ -1,25 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import AudioRecorder from "./components/AudioRecorder";
+import "./styles/App.css";
 
 function App() {
-  const [message, setMessage] = useState("Loading...");
-
-  useEffect(() => {
-    fetch("http://localhost:5000/api/hello")
-      .then(res => res.json())
-      .then(data => {
-        console.log("Backend response:", data);
-        setMessage(data.message);
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        setMessage("Backend not available");
-      });
-  }, []);
-  
-
   return (
-    <div style={{ padding: 20 }}>
-      <h1>{message}</h1>
+    <div className="container py-5">
+      <div className="text-center mb-4">
+        <img src="/logo.png" alt="Voice2Calendar logo" className="app-logo" />
+        <h1 className="fw-bold">Voice2Calendar</h1>
+        <p className="text-muted">Speak your plans — we’ll turn them into calendar events.</p>
+      </div>
+
+      <div className="card shadow-sm p-4 mx-auto" style={{ maxWidth: "540px" }}>
+        <h4 className="mb-3 text-center">🎤 Record & Upload</h4>
+        <AudioRecorder />
+      </div>
+
+      <footer className="text-center mt-5 text-muted small">
+        © 2025 Voice2Calendar. All rights reserved.
+      </footer>
     </div>
   );
 }
