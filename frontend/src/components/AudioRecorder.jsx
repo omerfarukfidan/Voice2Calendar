@@ -28,8 +28,10 @@ function AudioRecorder({ onTranscription }) {
   };
 
   const stopRecording = () => {
-    mediaRecorderRef.current.stop();
-    setRecording(false);
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+    }
   };
 
   const uploadAudio = async () => {
@@ -46,8 +48,9 @@ function AudioRecorder({ onTranscription }) {
       });
 
       const data = await response.json();
+
       if (onTranscription) {
-        onTranscription(data); // ✅ App.js'e sonucu gönder
+        onTranscription(data); // Pass result to App.js
       }
 
     } catch (err) {
@@ -59,6 +62,8 @@ function AudioRecorder({ onTranscription }) {
 
   return (
     <div className="recorder-container">
+      <h2 className="text-center mb-4">🎤 Voice2Calendar</h2>
+
       <div className="d-flex justify-content-center gap-2 mb-3">
         {!recording ? (
           <button className="btn btn-success" onClick={startRecording}>

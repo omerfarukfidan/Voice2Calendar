@@ -10,6 +10,7 @@ from flask_cors import CORS
 from vosk import Model, KaldiRecognizer
 from dateparser.search import search_dates
 import dateparser
+from google_calendar import create_event  
 
 app = Flask(__name__)
 CORS(app)
@@ -104,29 +105,46 @@ def transcribe():
     try:
         wf = wave.open(wav_path, "rb")
         rec = KaldiRecognizer(model, wf.getframerate())
-        result_text = ""
 
+        result_text = ""
         while True:
             data = wf.readframes(4000)
             if len(data) == 0:
                 break
-            rec.AcceptWaveform(data)
+            if rec.AcceptWaveform(data):
+                partial_result = json.loads(rec.Result()).get("text", "")
+                result_text += " " + partial_result
 
-        final_result = rec.FinalResult()
-        result_text = json.loads(final_result).get("text", "")
-        wf.close()
+        final_result = json.loads(rec.FinalResult())
+        result_text += " " + final_result.get("text", "")
+
+        print("📝 Final Transcription:", result_text)
 
         datetime_results = extract_datetime(result_text)
+        print("📅 Parsed Dates:", datetime_results)
+
+        # Create event if possible
+        event_link = None
+        if datetime_results:
+            try:
+                parsed_datetime = datetime.fromisoformat(datetime_results[0]["parsed"])
+                event_link = create_event("Voice2Calendar Event", parsed_datetime)
+                print("✅ Event Created:", event_link)
+            except Exception as cal_err:
+                print("❌ Calendar Error:", cal_err)
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": "Transcription failed", "details": str(e)}), 500
     finally:
         if os.path.exists(webm_path): os.remove(webm_path)
         if os.path.exists(wav_path): os.remove(wav_path)
 
     return jsonify({
-        "transcript": result_text,
-        "datetimes": datetime_results
+        "transcript": result_text.strip(),
+        "datetimes": datetime_results,
+        "calendar_event": event_link
     })
 
 if __name__ == "__main__":

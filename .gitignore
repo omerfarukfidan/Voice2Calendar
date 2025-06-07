@@ -26,3 +26,5 @@ backend/temp/
 
 # Zip models or archives if ever downloaded
 *.zip
+backend/token.json
+backend/client_secret.json
