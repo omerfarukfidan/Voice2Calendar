@@ -128,7 +128,7 @@ def transcribe():
         if datetime_results:
             try:
                 parsed_datetime = datetime.fromisoformat(datetime_results[0]["parsed"])
-                event_link = create_event("Voice2Calendar Event", parsed_datetime)
+                event_link = create_event(result_text.strip(), parsed_datetime)
                 print("✅ Event Created:", event_link)
             except Exception as cal_err:
                 print("❌ Calendar Error:", cal_err)
