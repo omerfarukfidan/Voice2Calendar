@@ -31,11 +31,8 @@ def create_event(full_text: str, start_datetime: datetime) -> str:
     creds = get_credentials()
     service = build("calendar", "v3", credentials=creds)
 
-    # Aktiviteyi başlık olarak bulmaya çalış
-    # Örn: "dentist appointment", "meeting", "gym", "call", vs.
-    # Burada sadece örnek olarak basit bir filtreleme yapıyoruz
     activity_keywords = ["dentist", "meeting", "appointment", "call", "gym", "lunch", "dinner"]
-    summary = "Voice2Calendar Event"  # varsayılan
+    summary = "Voice2Calendar Event"
     for keyword in activity_keywords:
         if keyword in full_text.lower():
             summary = " ".join([
